@@ -60,26 +60,3 @@ st.write(f"Prediction: **{churn_labels[prediction][0]}**")
 st.subheader('Prediction Probability')
 st.write(f"Churn: {prediction_proba[0][1]*100:.2f}%")
 st.write(f"No Churn: {prediction_proba[0][0]*100:.2f}%")
-
-# CSV Upload Prediction
-st.subheader("Batch Prediction from CSV")
-uploaded_file = st.file_uploader("Upload your CSV file (with proper columns)", type=["csv"])
-
-if uploaded_file is not None:
-    batch_data = pd.read_csv(uploaded_file)
-    st.write("Uploaded Data Preview:")
-    st.write(batch_data.head())
-
-    # Encoding for batch
-    batch_data['gender'] = batch_data['gender'].map({'Male': 1, 'Female': 0})
-    batch_data['subscription_type'] = batch_data['subscription_type'].map({'Basic': 0, 'Standard': 1, 'Premium': 2})
-    batch_data['login_activity'] = batch_data['login_activity'].map({'Active': 0, 'Inactive': 1})
-
-    batch_scaled = scaler.transform(batch_data[['age', 'gender', 'subscription_length', 'subscription_type', 'number_of_logins', 'login_activity', 'customer_ratings']])
-    batch_prediction = model.predict(batch_scaled)
-
-    batch_data['churn_prediction'] = churn_labels[batch_prediction]
-    st.write("Prediction Results:")
-    st.write(batch_data)
-
-    st.download_button("Download Predictions as CSV", batch_data.to_csv(index=False), "predictions.csv", "text/csv")
